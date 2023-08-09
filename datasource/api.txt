@@ -1,0 +1,4 @@
+https://api-prod.diemdaochieu.com/api/v1/file/data/finance-report?stockCode=%5EN225&type=QUARTER
+https://api-prod.diemdaochieu.com/market/indicators/index?timeStage=_3Y&ticker=VNINDEX
+https://api-prod.diemdaochieu.com/market/indicators/index?timeStage=_1Y&ticker=VNINDEX
+https://api-prod.diemdaochieu.com/market/indicators/index?timeStage=_6M&ticker=VNINDEX
