@@ -4,64 +4,85 @@ const FormData = require('form-data')
 const utils = require("./utilities")
 const strftime = require('strftime')
 const _ = require("lodash")
-const fs =  require ( 'fs' );
-const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJpZFwiOjE3MSxcInNlc3Npb25JZFwiOjI0MTE2LFwidXNlcm5hbWVcIjpcImh1bmd2dG0wMEBnbWFpbC5jb21cIixcInJvbGVDb2Rlc1wiOltcIlVTRVJcIl0sXCJwZXJtaXNzaW9uc1wiOltdfSIsInNjb3BlcyI6WyJST0xFX1VTRVIiXSwiaXNzIjoiaHR0cHM6Ly9kaWVtZGFvY2hpZXUuY29tIiwiaWF0IjoxNjkxNjA4MjUyLCJleHAiOjIwMDY5NjgyNTJ9.GcNpb0Wl2HqCkBa4dZfpGsfwnsm4AhlZziqn1OdajOd02022tuv8ZZp2kHY1PD4i1_5X9rXbWCIPSpYqIsn1Gw';
+const fs = require('fs');
+const { faker } = require('@faker-js/faker');
 
-const random = (min, max) => {
-    return parseInt(Math.random() * (max - min) + min)
-  }
+//use axios as you normally would, but specify httpsAgent in the config
+//curl --proxy "http://118.69.134.0:80" http://api-prod.diemdaochieu.com/api/v1/data/search-stock?code=HSG
 
 const prepPostArgs = (url, formData) => {
-    let headers = {"x-ddc-token": token}
-
-    return { method: "post", url, data: formData, headers, 
-        validateStatus: function(status) {return false}}
-    }
-
-const prepGetArgs = (url) => {
-    let headers = {"x-ddc-token": token}
-
-    return { method: "get", url, headers, 
-        validateStatus: function(status) {return false}}
-    }
-
-const getNotification1 = () => {
-    let size = 30 + random(0, 9)
-    let url = `http://api-prod.diemdaochieu.com/notification/list?page=0&type=GENERAL&size=${size}`
-    let args = prepGetArgs(url)
-    return axios(args)
-  }
-  const getNotification2 = () => {
-    let size = 30 + random(0, 9)
-    let url = `http://api-prod.diemdaochieu.com/notification/list?page=0&type=REALTIME&size=${size}`
-    let args = prepGetArgs(url)
-    return axios(args)
-  }
-  const getNotification3 = () => {
-    let size = 30 + random(0, 9)
-    let url = `http://api-prod.diemdaochieu.com/notification/list?page=0&type=BUY_SALE&size=${size}`
-    let args = prepGetArgs(url)
-    return axios(args)
-  }
-const groupByType = () => {
-    let url = `http://api-prod.diemdaochieu.com/notification/group-by-type`
-    let args = prepGetArgs(url)
-    return axios(args)
+  let headers = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
+    'Platform': 'WEB'
   }
 
-//   const markRead = () => {
-//     let url = `http://api-prod.diemdaochieu.com/notification/mark-all-read`
-//     let args = prepPostArgs(url, {})
-//     return axios(args)
-//   }  
+  const proxy =  {
+    protocol: 'http',
+    host: '118.69.134.0',
+    port: 80
+  };
+
+
+  return {
+    method: "post", url, data: formData, headers, proxy,
+    validateStatus: function (status) { return false }
+  }
+}
+
+const signUp = () => {
+  let url = `http://api-prod.diemdaochieu.com/auth/signup`
+
+  const randomName = faker.person.fullName(); // Rowan Nikolaus
+  const randomEmail = faker.internet.email(); // Kassandra.Haley@erich.biz
+  const phoneNumber = faker.phone.number('09########')
+  let formData = {
+    "fullName": randomName,
+    "email": randomEmail,
+    "password": phoneNumber,
+    "phoneNumber": phoneNumber
+  };
+
+  let args = prepPostArgs(url, formData)
+  return axios(args)
+}
+
+const loginApple = () => {
+  let url = `http://api-prod.diemdaochieu.com/auth/login/apple`
+
+  let formData = {
+    "identityToken": faker.phone.imei(),
+    "authorizationCode": faker.phone.imei(),
+    "userIdentifier": faker.phone.imei(),
+    "email": faker.internet.email()
+  };
+  let args = prepPostArgs(url, formData)
+  return axios(args)
+}
+
+
+const addContact = () => {
+  let url = `http://api-prod.diemdaochieu.com/notification/client/add-contact`
+
+  let formData = {
+    "fullName": faker.person.fullName(),
+    "phoneNumber": faker.phone.number('09########'),
+    "email": faker.internet.email(),
+    "title": faker.phone.imei(),
+    "content": faker.phone.imei()
+  };
+
+  let args = prepPostArgs(url, formData)
+  return axios(args)
+}
+
+// {"fullName":"afaf","phoneNumber":"0999111111","email":"hfgsd2323@gmail.com","title":"vvv","content":"vvvvvvv"}
+// https://api-prod.diemdaochieu.com/notification/client/add-contact
 
 const REQUESTS2 = (() => {
-    return [
-    getNotification1,
-    getNotification3,
-    getNotification2,
-    groupByType,
-    ]
-  })()
-  
-  module.exports = REQUESTS2
+  return [
+    signUp,loginApple
+  ]
+})()
+
+module.exports = REQUESTS2

